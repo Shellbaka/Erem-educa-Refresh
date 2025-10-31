@@ -104,5 +104,5 @@ como parte da disciplina Embarque Digital – Recife/PE, 2025.
 
 ## Integrantes 
 
--Kewen Wesley Gonçalves de Santana.
--Matheus Marques.
+- Kewen Wesley Gonçalves de Santana.
+- Matheus Marques

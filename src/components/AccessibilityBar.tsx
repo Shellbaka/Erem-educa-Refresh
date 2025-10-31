@@ -1,4 +1,4 @@
-import { Settings, Type, Eye, Moon, Sun, Volume2, VolumeX } from "lucide-react";
+import { Settings, Type, Eye, Moon, Sun, Volume2, VolumeX, AudioLines } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -16,6 +16,9 @@ export const AccessibilityBar = () => {
   const [highContrast, setHighContrast] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [soundsEnabled, setSoundsEnabled] = useState(true);
+  const [audioDescriptionEnabled, setAudioDescriptionEnabled] = useState(
+    () => localStorage.getItem("audio-description-enabled") === "true"
+  );
   const { showAccessibleToast } = useAccessibleToast();
 
   useEffect(() => {
@@ -41,6 +44,12 @@ export const AccessibilityBar = () => {
   useEffect(() => {
     localStorage.setItem("sounds-enabled", soundsEnabled.toString());
   }, [soundsEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem("audio-description-enabled", audioDescriptionEnabled.toString());
+    // Emit an event so controllers can react without prop drilling
+    window.dispatchEvent(new CustomEvent("audio-description-toggle", { detail: { enabled: audioDescriptionEnabled } }));
+  }, [audioDescriptionEnabled]);
 
   const handleSoundsToggle = (enabled: boolean) => {
     setSoundsEnabled(enabled);
@@ -143,6 +152,19 @@ export const AccessibilityBar = () => {
                   checked={soundsEnabled}
                   onCheckedChange={handleSoundsToggle}
                   aria-label="Ativar ou desativar feedback sonoro"
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="audio-description" className="flex items-center gap-2">
+                  <AudioLines className="h-4 w-4" />
+                  Audiodescrição
+                </Label>
+                <Switch
+                  id="audio-description"
+                  checked={audioDescriptionEnabled}
+                  onCheckedChange={setAudioDescriptionEnabled}
+                  aria-label="Ativar ou desativar audiodescrição"
                 />
               </div>
             </div>

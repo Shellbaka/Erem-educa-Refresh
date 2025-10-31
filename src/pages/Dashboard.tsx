@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -71,13 +71,14 @@ export default function Dashboard() {
 
   const userType = user?.user_metadata?.user_type || "student";
   const userName = user?.user_metadata?.name || "Usuário";
+  const headerBg = userType === "student" ? "from-primary/20 to-primary/5" : userType === "teacher" ? "from-secondary/20 to-secondary/5" : "from-accent/20 to-accent/5";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background">
       <AccessibilityBar />
       
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40">
+      <header className={`border-b bg-gradient-to-r ${headerBg} backdrop-blur-sm sticky top-0 z-40`}>
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -122,82 +123,94 @@ export default function Dashboard() {
           {/* Student Dashboard */}
           {userType === "student" && (
             <>
-              <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center mb-2">
-                    <BookOpen className="h-6 w-6 text-primary" />
-                  </div>
-                  <CardTitle>Meus Conteúdos</CardTitle>
-                  <CardDescription>
-                    Acesse materiais e atividades das suas disciplinas
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/student/contents" className="block focus:outline-none focus:ring-2 focus:ring-primary rounded-md" aria-label="Ir para Meus Conteúdos">
+                <Card className="hover:shadow-lg transition-all cursor-pointer" role="link">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center mb-2">
+                      <BookOpen className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle>Meus Conteúdos</CardTitle>
+                    <CardDescription>
+                      Acesse materiais e atividades das suas disciplinas
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
 
-              <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-secondary-light flex items-center justify-center mb-2">
-                    <TrendingUp className="h-6 w-6 text-secondary" />
-                  </div>
-                  <CardTitle>Desempenho</CardTitle>
-                  <CardDescription>
-                    Acompanhe suas notas e progresso
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/student/performance" className="block focus:outline-none focus:ring-2 focus:ring-secondary rounded-md" aria-label="Ir para Desempenho">
+                <Card className="hover:shadow-lg transition-all cursor-pointer" role="link">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-secondary-light flex items-center justify-center mb-2">
+                      <TrendingUp className="h-6 w-6 text-secondary" />
+                    </div>
+                    <CardTitle>Desempenho</CardTitle>
+                    <CardDescription>
+                      Acompanhe suas notas e progresso
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
 
-              <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-accent-light flex items-center justify-center mb-2">
-                    <MessageSquare className="h-6 w-6 text-accent" />
-                  </div>
-                  <CardTitle>Mensagens</CardTitle>
-                  <CardDescription>
-                    Converse com seus professores
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/student/messages" className="block focus:outline-none focus:ring-2 focus:ring-accent rounded-md" aria-label="Ir para Mensagens">
+                <Card className="hover:shadow-lg transition-all cursor-pointer" role="link">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-accent-light flex items-center justify-center mb-2">
+                      <MessageSquare className="h-6 w-6 text-accent" />
+                    </div>
+                    <CardTitle>Mensagens</CardTitle>
+                    <CardDescription>
+                      Converse com seus professores
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
             </>
           )}
 
           {/* Teacher Dashboard */}
           {userType === "teacher" && (
             <>
-              <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center mb-2">
-                    <Users className="h-6 w-6 text-primary" />
-                  </div>
-                  <CardTitle>Minhas Turmas</CardTitle>
-                  <CardDescription>
-                    Gerencie suas turmas e estudantes
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/teacher/classes" className="block focus:outline-none focus:ring-2 focus:ring-primary rounded-md" aria-label="Ir para Minhas Turmas">
+                <Card className="hover:shadow-lg transition-all cursor-pointer" role="link">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center mb-2">
+                      <Users className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle>Minhas Turmas</CardTitle>
+                    <CardDescription>
+                      Gerencie suas turmas e estudantes
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
 
-              <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-secondary-light flex items-center justify-center mb-2">
-                    <BookOpen className="h-6 w-6 text-secondary" />
-                  </div>
-                  <CardTitle>Conteúdos</CardTitle>
-                  <CardDescription>
-                    Publique e organize materiais pedagógicos
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/teacher/contents" className="block focus:outline-none focus:ring-2 focus:ring-secondary rounded-md" aria-label="Ir para Conteúdos">
+                <Card className="hover:shadow-lg transition-all cursor-pointer" role="link">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-secondary-light flex items-center justify-center mb-2">
+                      <BookOpen className="h-6 w-6 text-secondary" />
+                    </div>
+                    <CardTitle>Conteúdos</CardTitle>
+                    <CardDescription>
+                      Publique e organize materiais pedagógicos
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
 
-              <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-accent-light flex items-center justify-center mb-2">
-                    <Calendar className="h-6 w-6 text-accent" />
-                  </div>
-                  <CardTitle>Atividades</CardTitle>
-                  <CardDescription>
-                    Crie e agende avaliações
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/teacher/activities" className="block focus:outline-none focus:ring-2 focus:ring-accent rounded-md" aria-label="Ir para Atividades">
+                <Card className="hover:shadow-lg transition-all cursor-pointer" role="link">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-accent-light flex items-center justify-center mb-2">
+                      <Calendar className="h-6 w-6 text-accent" />
+                    </div>
+                    <CardTitle>Atividades</CardTitle>
+                    <CardDescription>
+                      Crie e agende avaliações
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
             </>
           )}
 

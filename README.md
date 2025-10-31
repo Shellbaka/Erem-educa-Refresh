@@ -101,3 +101,8 @@ independentemente de limitações físicas ou sensoriais.
 Desenvolvido por estudantes do curso de Análise e Desenvolvimento de Sistemas – UNINASSAU,
 sob orientação do professor André Caetano,
 como parte da disciplina Embarque Digital – Recife/PE, 2025.
+
+## Integrantes 
+
+-Kewen Wesley Gonçalves de Santana.
+-Matheus Marques.

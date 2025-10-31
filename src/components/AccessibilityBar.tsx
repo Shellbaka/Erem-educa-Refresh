@@ -1,4 +1,4 @@
-import { Settings, Type, Eye, Moon, Sun } from "lucide-react";
+import { Settings, Type, Eye, Moon, Sun, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -9,11 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
+import { useAccessibleToast } from "@/hooks/useAccessibleToast";
 
 export const AccessibilityBar = () => {
   const [fontSize, setFontSize] = useState(16);
   const [highContrast, setHighContrast] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [soundsEnabled, setSoundsEnabled] = useState(true);
+  const { showAccessibleToast } = useAccessibleToast();
 
   useEffect(() => {
     document.documentElement.style.fontSize = `${fontSize}px`;
@@ -34,6 +37,29 @@ export const AccessibilityBar = () => {
       document.documentElement.classList.remove("dark");
     }
   }, [isDark]);
+
+  useEffect(() => {
+    localStorage.setItem("sounds-enabled", soundsEnabled.toString());
+  }, [soundsEnabled]);
+
+  const handleSoundsToggle = (enabled: boolean) => {
+    setSoundsEnabled(enabled);
+    if (enabled) {
+      showAccessibleToast({
+        title: "Sons ativados",
+        description: "Você receberá feedback sonoro nas ações",
+        type: "success",
+        playSound: true,
+      });
+    } else {
+      showAccessibleToast({
+        title: "Sons desativados",
+        description: "Feedback sonoro foi desativado",
+        type: "info",
+        playSound: false,
+      });
+    }
+  };
 
   return (
     <div 
@@ -104,6 +130,19 @@ export const AccessibilityBar = () => {
                   checked={isDark}
                   onCheckedChange={setIsDark}
                   aria-label="Alternar modo escuro"
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="sounds" className="flex items-center gap-2">
+                  {soundsEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                  Feedback sonoro
+                </Label>
+                <Switch
+                  id="sounds"
+                  checked={soundsEnabled}
+                  onCheckedChange={handleSoundsToggle}
+                  aria-label="Ativar ou desativar feedback sonoro"
                 />
               </div>
             </div>

@@ -177,6 +177,41 @@ All colors MUST be HSL.
       --ring: 0 0% 0%;
     }
   }
+
+  /* High contrast mode toggle */
+  .high-contrast {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --primary: 220 100% 30%;
+    --primary-foreground: 0 0% 100%;
+    --border: 0 0% 0%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 10%;
+  }
+
+  .high-contrast.dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 100%;
+    --primary: 220 100% 70%;
+    --primary-foreground: 0 0% 0%;
+    --border: 0 0% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 90%;
+  }
+
+  /* VLibras custom styles */
+  [vw-access-button] {
+    /* Hide default VLibras button as we have custom */
+    display: none !important;
+  }
+
+  [vw-plugin-wrapper] {
+    z-index: 9999999 !important;
+  }
 }
 
 @layer utilities {
@@ -198,5 +233,19 @@ All colors MUST be HSL.
 
   .shadow-glow {
     box-shadow: 0 0 24px hsl(var(--primary) / 0.25);
+  }
+
+  /* Pulse animation for important alerts */
+  @keyframes pulse-ring {
+    0% {
+      box-shadow: 0 0 0 0 hsl(var(--primary) / 0.7);
+    }
+    100% {
+      box-shadow: 0 0 0 10px hsl(var(--primary) / 0);
+    }
+  }
+
+  .alert-pulse {
+    animation: pulse-ring 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }

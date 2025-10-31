@@ -1,73 +1,103 @@
-# Welcome to your Lovable project
+# 🧩 Erem Conecta – Plataforma Educacional Inclusiva
 
-## Project info
+**Projeto desenvolvido para a disciplina de Embarque Digital**, ministrada pelo **professor André Caetano**, no curso de **Análise e Desenvolvimento de Sistemas (ADS)** – **5º Período / UNINASSAU – Recife-PE**.
 
-**URL**: https://lovable.dev/projects/9777f8a2-08d1-46ed-8860-5caf75c6cd5d
+---
+## 📘 Descrição do Projeto
 
-## How can I edit this code?
+O **Erem Conecta** é uma plataforma educacional acessível, desenvolvida como parte de um projeto acadêmico com foco em **inclusão digital e acessibilidade educacional**.  
+Seu objetivo é conectar **professores e estudantes**, garantindo o acesso igualitário ao conteúdo pedagógico, especialmente para **pessoas com deficiência visual e auditiva**.
 
-There are several ways of editing your application.
+O sistema contempla funcionalidades como:
+- Tradução automática para **Libras** (VLibras/HandTalk API);  
+- **Audiodescrição** de conteúdos visuais;  
+- **Alertas visuais e sonoros** personalizáveis;  
+- Telas diferenciadas para **alunos** e **professores**;  
+- Acompanhamento de desempenho e comunicação acessível.
 
-**Use Lovable**
+---
+## 👨‍🏫 Contexto Acadêmico
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9777f8a2-08d1-46ed-8860-5caf75c6cd5d) and start prompting.
+- **Instituição:** UNINASSAU – Centro Universitário Maurício de Nassau  
+- **Curso:** Análise e Desenvolvimento de Sistemas (ADS)  
+- **Período:** 5º  
+- **Disciplina:** Embarque Digital  
+- **Professor orientador:** André Caetano  
+- **Local:** Recife – PE  
+- **Ano:** 2025  
 
-Changes made via Lovable will be committed automatically to this repo.
+---
+## 💻 Tecnologias Utilizadas
 
-**Use your preferred IDE**
+O projeto foi desenvolvido com foco em performance e acessibilidade, utilizando as seguintes tecnologias:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Vite** – build tool rápida para projetos React  
+- **TypeScript** – tipagem estática e robustez no código  
+- **React** – estrutura modular e declarativa  
+- **shadcn/ui** – componentes acessíveis e prontos para uso  
+- **Tailwind CSS** – estilização rápida e responsiva  
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
+## ⚙️ Como editar ou executar o projeto
 
-Follow these steps:
+### 🔹 Opção 1 – Usando o Lovable
+Basta acessar o projeto diretamente no Lovable:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+👉 [Acesse o projeto aqui](https://lovable.dev/projects/9777f8a2-08d1-46ed-8860-5caf75c6cd5d)
 
-# Step 2: Navigate to the project directory.
+As alterações feitas via Lovable são **automaticamente commitadas** no repositório GitHub.
+
+---
+### 🔹 Opção 2 – Editando localmente com seu IDE
+
+1. **Clone o repositório:**
+   ```bash
+   git clone <YOUR_GIT_URL>
+Acesse o diretório do projeto:
+
+bash
+Copy code
 cd <YOUR_PROJECT_NAME>
+Instale as dependências:
 
-# Step 3: Install the necessary dependencies.
+bash
+Copy code
 npm i
+Execute o servidor de desenvolvimento:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+bash
+Copy code
 npm run dev
-```
+O projeto abrirá automaticamente no navegador, com recarregamento instantâneo.
 
-**Edit a file directly in GitHub**
+🔹 Opção 3 – Editando diretamente pelo GitHub
+Navegue até o arquivo desejado.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Clique no ícone ✏️ (“Edit”).
 
-**Use GitHub Codespaces**
+Faça as alterações e confirme o commit.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+🔹 Opção 4 – Usando GitHub Codespaces
+Acesse o repositório principal.
 
-## What technologies are used for this project?
+Clique em Code → Codespaces → New Codespace.
 
-This project is built with:
+Edite diretamente no ambiente online e depois commit/push.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+🚀 Deploy e Domínio Personalizado
+Para publicar o projeto, acesse Lovable → Share → Publish.
 
-## How can I deploy this project?
+É possível conectar um domínio personalizado em:
+Project → Settings → Domains → Connect Domain.
 
-Simply open [Lovable](https://lovable.dev/projects/9777f8a2-08d1-46ed-8860-5caf75c6cd5d) and click on Share -> Publish.
+Mais detalhes: Documentação Lovable – Custom Domains
 
-## Can I connect a custom domain to my Lovable project?
+🧠 Objetivo do Projeto
+Promover inclusão digital e acessibilidade através da tecnologia,
+proporcionando ferramentas que aproximem estudantes e professores,
+independentemente de limitações físicas ou sensoriais.
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+✍️ Créditos
+Desenvolvido por estudantes do curso de Análise e Desenvolvimento de Sistemas – UNINASSAU,
+sob orientação do professor André Caetano,
+como parte da disciplina Embarque Digital – Recife/PE, 2025.

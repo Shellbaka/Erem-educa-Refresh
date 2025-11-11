@@ -13,10 +13,14 @@ import { AudiodescriptionController } from "@/components/AudiodescriptionControl
 import StudentContents from "./pages/student/Contents";
 import StudentPerformance from "./pages/student/Performance";
 import StudentMessages from "./pages/student/Messages";
+import StudentHelpPage from "./pages/student/Help";
 import TeacherClasses from "./pages/teacher/Classes";
 import TeacherContents from "./pages/teacher/Contents";
 import TeacherActivities from "./pages/teacher/Activities";
+import TeacherSubjectsPage from "./pages/teacher/Subjects";
 import TodosPage from "./pages/Todos";
+import AdminUsersPage from "./pages/admin/Users";
+import ProfilePage from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -34,14 +38,19 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/todos" element={<TodosPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           {/* Student routes */}
           <Route path="/student/contents" element={<StudentContents />} />
           <Route path="/student/performance" element={<StudentPerformance />} />
           <Route path="/student/messages" element={<StudentMessages />} />
+          <Route path="/student/help" element={<StudentHelpPage />} />
           {/* Teacher routes */}
           <Route path="/teacher/classes" element={<TeacherClasses />} />
           <Route path="/teacher/contents" element={<TeacherContents />} />
           <Route path="/teacher/activities" element={<TeacherActivities />} />
+          <Route path="/professor/materias" element={<TeacherSubjectsPage />} />
+          {/* Admin routes */}
+          <Route path="/admin/users" element={<AdminUsersPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

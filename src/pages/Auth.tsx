@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,71 @@ export default function Auth() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [userType, setUserType] = useState<string>("");
+  const [deficiency, setDeficiency] = useState<string>("none");
+  const [schools, setSchools] = useState<Array<{ id: string; nome: string }>>([]);
+  const [isLoadingSchools, setIsLoadingSchools] = useState(false);
+  const [schoolId, setSchoolId] = useState<string>("");
+  const [turmas, setTurmas] = useState<Array<{ id: string; nome: string; ano: string | null }>>([]);
+  const [isLoadingClasses, setIsLoadingClasses] = useState(false);
+  const [classId, setClassId] = useState<string>("");
+
+  useEffect(() => {
+    const loadSchools = async () => {
+      try {
+        setIsLoadingSchools(true);
+        const { data, error } = await supabase
+          .from("escolas")
+          .select("id, nome")
+          .order("nome", { ascending: true });
+
+        if (error) throw error;
+        setSchools(data || []);
+      } catch (error: any) {
+        toast.error(error.message || "Não foi possível carregar as escolas");
+      } finally {
+        setIsLoadingSchools(false);
+      }
+    };
+
+    loadSchools();
+  }, []);
+
+  useEffect(() => {
+    const loadTurmas = async () => {
+      if (!schoolId) {
+        setTurmas([]);
+        setClassId("");
+        return;
+      }
+
+      try {
+        setIsLoadingClasses(true);
+        const { data, error } = await supabase
+          .from("turmas")
+          .select("id, nome, ano")
+          .eq("escola_id", schoolId)
+          .order("nome", { ascending: true });
+
+        if (error) throw error;
+        setTurmas(data || []);
+      } catch (error: any) {
+        toast.error(error.message || "Não foi possível carregar as turmas");
+      } finally {
+        setIsLoadingClasses(false);
+      }
+    };
+
+    loadTurmas();
+  }, [schoolId]);
+
+  const deficiencyOptions = useMemo(
+    () => [
+      { value: "none", label: "Nenhuma" },
+      { value: "Visual", label: "Visual" },
+      { value: "Auditiva", label: "Auditiva" },
+    ],
+    []
+  );
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,8 +122,20 @@ export default function Auth() {
       return;
     }
 
+    if (!schoolId) {
+      toast.error("Selecione a escola");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!classId) {
+      toast.error("Selecione a turma");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -66,11 +143,29 @@ export default function Auth() {
           data: {
             name,
             user_type: userType,
+            deficiencia: deficiency !== "none" ? deficiency : null,
+            escola_id: schoolId,
+            turma_id: classId,
           },
         },
       });
 
       if (error) throw error;
+
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .upsert({
+            id: data.user.id,
+            name,
+            user_type: userType,
+            deficiencia: deficiency !== "none" ? deficiency : null,
+            escola_id: schoolId,
+            turma_id: classId,
+          });
+
+        if (profileError) throw profileError;
+      }
 
       toast.success("Conta criada! Você já pode fazer login.");
       setTimeout(() => {
@@ -210,6 +305,79 @@ export default function Auth() {
                         <SelectItem value="student">Estudante</SelectItem>
                         <SelectItem value="teacher">Professor(a)</SelectItem>
                         <SelectItem value="admin">Administrador(a)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="deficiency">Deficiência (opcional)</Label>
+                    <Select value={deficiency} onValueChange={setDeficiency}>
+                      <SelectTrigger id="deficiency">
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {deficiencyOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="school">Escola</Label>
+                    <Select
+                      value={schoolId}
+                      onValueChange={(value) => {
+                        setSchoolId(value);
+                        setClassId("");
+                      }}
+                      required
+                    >
+                      <SelectTrigger id="school" aria-required="true">
+                        <SelectValue placeholder={isLoadingSchools ? "Carregando escolas..." : "Selecione a escola"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {schools.length === 0 && !isLoadingSchools ? (
+                          <SelectItem value="" disabled>Nenhuma escola cadastrada</SelectItem>
+                        ) : null}
+                        {schools.map((school) => (
+                          <SelectItem key={school.id} value={school.id}>
+                            {school.nome}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="class">Turma</Label>
+                    <Select
+                      value={classId}
+                      onValueChange={setClassId}
+                      required
+                      disabled={!schoolId || isLoadingClasses}
+                    >
+                      <SelectTrigger id="class" aria-required="true">
+                        <SelectValue placeholder={
+                          !schoolId
+                            ? "Selecione uma escola primeiro"
+                            : isLoadingClasses
+                            ? "Carregando turmas..."
+                            : "Selecione a turma"
+                        } />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {turmas.length === 0 && !isLoadingClasses ? (
+                          <SelectItem value="" disabled>Nenhuma turma cadastrada</SelectItem>
+                        ) : null}
+                        {turmas.map((turma) => (
+                          <SelectItem key={turma.id} value={turma.id}>
+                            {turma.nome}
+                            {turma.ano ? ` • ${turma.ano}` : ""}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

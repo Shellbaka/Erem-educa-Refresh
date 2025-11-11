@@ -155,6 +155,50 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background: 
+      linear-gradient(135deg, hsl(210, 85%, 98%) 0%, hsl(150, 60%, 98%) 50%, hsl(210, 85%, 98%) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  body.deficiency-visual {
+    font-size: 1.075rem;
+    letter-spacing: 0.01em;
+  }
+
+  body.deficiency-visual .card-school,
+  body.deficiency-visual button,
+  body.deficiency-visual .btn,
+  body.deficiency-visual .shadow-school,
+  body.deficiency-visual .shadow-school-lg {
+    box-shadow: 0 0 0 2px hsl(var(--foreground) / 0.12), 0 12px 24px -6px hsl(var(--foreground) / 0.1);
+    border-width: 2px;
+    border-color: hsl(var(--foreground) / 0.2);
+  }
+
+  body.deficiency-visual svg {
+    transform: scale(1.1);
+  }
+
+  body.deficiency-visual .text-sm {
+    font-size: 0.95rem;
+  }
+
+  body.deficiency-auditiva .libras-button {
+    animation: pulse-highlight 1.8s ease-in-out infinite;
+    border-color: hsl(var(--secondary));
+    box-shadow: 0 0 0 4px hsl(var(--secondary) / 0.25);
+  }
+
+  @keyframes pulse-highlight {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.85;
+    }
   }
 
   /* Accessibility improvements */
@@ -247,5 +291,75 @@ All colors MUST be HSL.
 
   .alert-pulse {
     animation: pulse-ring 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* School-themed background pattern */
+  .school-bg {
+    background: 
+      linear-gradient(135deg, hsl(210, 85%, 98%) 0%, hsl(150, 60%, 98%) 100%),
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        hsl(210, 85%, 95%) 10px,
+        hsl(210, 85%, 95%) 20px
+      );
+    background-size: 100% 100%, 40px 40px;
+  }
+
+  /* Enhanced shadows for cards */
+  .shadow-school {
+    box-shadow: 
+      0 4px 6px -1px rgba(34, 197, 94, 0.1),
+      0 2px 4px -1px rgba(59, 130, 246, 0.1),
+      0 0 0 1px rgba(34, 197, 94, 0.05);
+  }
+
+  .shadow-school-lg {
+    box-shadow: 
+      0 10px 15px -3px rgba(34, 197, 94, 0.1),
+      0 4px 6px -2px rgba(59, 130, 246, 0.1),
+      0 0 0 1px rgba(34, 197, 94, 0.05);
+  }
+
+  /* Scroll animation utilities */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* School-themed card hover effects */
+  .card-school {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid hsl(var(--border));
+  }
+
+  .card-school:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 12px 24px -4px rgba(34, 197, 94, 0.15),
+      0 8px 16px -4px rgba(59, 130, 246, 0.15),
+      0 0 0 1px rgba(34, 197, 94, 0.1);
   }
 }

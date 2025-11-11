@@ -6,6 +6,7 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   name text,
   user_type text check (user_type in ('student','teacher','admin')),
+  avatar_url text,
   created_at timestamptz default now()
 );
 
@@ -66,6 +67,26 @@ alter table public.messages enable row level security;
 drop policy if exists "read own profile" on public.profiles;
 create policy "read own profile" on public.profiles
 for select to authenticated using (auth.uid() = id);
+
+drop policy if exists "admins read profiles" on public.profiles;
+create policy "admins read profiles" on public.profiles
+for select to authenticated using (
+  exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid() and p.user_type = 'admin'
+  )
+);
+
+drop policy if exists "admins update profiles" on public.profiles;
+create policy "admins update profiles" on public.profiles
+for update to authenticated using (
+  exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid() and p.user_type = 'admin'
+  )
+);
 
 drop policy if exists "update own profile" on public.profiles;
 create policy "update own profile" on public.profiles

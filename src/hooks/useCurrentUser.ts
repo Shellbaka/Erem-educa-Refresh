@@ -34,27 +34,45 @@ export function useCurrentUser() {
   const [error, setError] = useState<string | null>(null);
 
   const loadProfile = useCallback(async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select(`
-          id,
-          name,
-          user_type,
-          avatar_url,
-          deficiencia,
-          turma_id,
-          escola_id,
-          created_at,
-          turma:turma_id ( id, nome, ano, escola:escola_id ( id, nome ) ),
-          escola:escola_id ( id, nome, endereco )
-        `)
-        .eq("id", userId)
-        .single();
+    const fetchProfile = async (includeAvatar = true) => {
+      const selectFields = `
+        id,
+        name,
+        user_type,
+        ${includeAvatar ? "avatar_url," : ""}
+        deficiencia,
+        turma_id,
+        escola_id,
+        created_at,
+        turma:turma_id ( id, nome, ano, escola:escola_id ( id, nome ) ),
+        escola:escola_id ( id, nome, endereco )
+      `;
 
+      return supabase.from("profiles").select(selectFields).eq("id", userId).single();
+    };
+
+    try {
+      const { data, error } = await fetchProfile(true);
       if (error) throw error;
       setProfile(data);
     } catch (err: any) {
+      const message = (err?.message || "").toLowerCase();
+      const hasAvatarColumnIssue = message.includes("avatar_url");
+
+      if (hasAvatarColumnIssue) {
+        try {
+          const { data, error } = await fetchProfile(false);
+          if (error) throw error;
+          setProfile(data);
+          setError(null);
+          return;
+        } catch (fallbackError: any) {
+          setError(fallbackError.message || "Não foi possível carregar o perfil");
+          setProfile(null);
+          return;
+        }
+      }
+
       setError(err.message || "Não foi possível carregar o perfil");
       setProfile(null);
     }

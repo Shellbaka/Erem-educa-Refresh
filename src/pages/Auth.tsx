@@ -24,6 +24,34 @@ export default function Auth() {
   const [isLoadingClasses, setIsLoadingClasses] = useState(false);
   const [classId, setClassId] = useState<string>("");
   const [turno, setTurno] = useState<string>("manha");
+  const [hasWarnedAboutLegacyProfile, setHasWarnedAboutLegacyProfile] = useState(false);
+  const upsertProfileWithFallback = async (payload: Record<string, any>) => {
+    const attempt = async (body: Record<string, any>, allowRetry: boolean) => {
+      const { error } = await supabase.from("profiles").upsert(body);
+
+      if (error) {
+        const errorMessage = (error.message || "").toLowerCase();
+        const isMissingTurnoColumn =
+          errorMessage.includes('column "turno"') || errorMessage.includes("column turno");
+
+        if (allowRetry && isMissingTurnoColumn) {
+          if (!hasWarnedAboutLegacyProfile) {
+            toast.info("Atualize as migrações para salvar o turno dos estudantes.", {
+              description: "Estamos registrando o restante das informações sem o campo de turno.",
+            });
+            setHasWarnedAboutLegacyProfile(true);
+          }
+
+          const { turno: _ignored, ...fallback } = body;
+          return attempt(fallback, false);
+        }
+
+        throw error;
+      }
+    };
+
+    await attempt(payload, true);
+  };
 
   useEffect(() => {
     const loadSchools = async () => {
@@ -155,19 +183,15 @@ export default function Auth() {
       if (error) throw error;
 
       if (data.user) {
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .upsert({
-            id: data.user.id,
-            name,
-            user_type: userType,
-            deficiencia: deficiency !== "none" ? deficiency : null,
-            escola_id: schoolId,
-            turma_id: classId,
-            turno,
-          });
-
-        if (profileError) throw profileError;
+        await upsertProfileWithFallback({
+          id: data.user.id,
+          name,
+          user_type: userType,
+          deficiencia: deficiency !== "none" ? deficiency : null,
+          escola_id: schoolId,
+          turma_id: classId,
+          turno,
+        });
       }
 
       toast.success("Conta criada! Você já pode fazer login.");

@@ -22,14 +22,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RefreshCcw, PencilLine, ShieldCheck } from "lucide-react";
-import { useCurrentUser, type Profile } from "@/hooks/useCurrentUser";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ProtectedPageLayout } from "@/components/ProtectedPageLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { fetchEscolas, fetchTurmas } from "@/services/user";
 
-type ProfileRow = Profile & {
-  email?: string | null;
+type ProfileRow = {
+  id: string;
+  name: string | null;
+  user_type: "student" | "teacher" | "admin" | null;
+  deficiencia?: string | null;
+  turma_id?: string | null;
+  escola_id?: string | null;
+  turno?: string | null;
+  created_at?: string | null;
+  escola_nome?: string;
+  turma_nome?: string;
+  turma_ano?: string | null;
 };
 
 export default function AdminUsersPage() {
@@ -103,16 +113,67 @@ export default function AdminUsersPage() {
           deficiencia,
           turma_id,
           escola_id,
-          created_at,
-          avatar_url
+          turno,
+          created_at
         `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      const formatted: ProfileRow[] = (data || []).map((row) => ({
+      const profilesData = (data || []) as ProfileRow[];
+      const escolaIds = Array.from(
+        new Set(profilesData.map((row) => row.escola_id).filter((id): id is string => Boolean(id)))
+      );
+      const turmaIds = Array.from(
+        new Set(profilesData.map((row) => row.turma_id).filter((id): id is string => Boolean(id)))
+      );
+
+      const escolasMap: Record<string, string> = {};
+      if (escolaIds.length > 0) {
+        const { data: escolasData, error: escolasError } = await supabase
+          .from("escolas")
+          .select("id, nome")
+          .in("id", escolaIds);
+
+        if (escolasError) {
+          if ((escolasError as any)?.code === "42P01") {
+            toast.info("Tabela de escolas não encontrada. Rode as migrações para liberar este vínculo.");
+          } else {
+            throw escolasError;
+          }
+        } else {
+          (escolasData || []).forEach((escola) => {
+            escolasMap[escola.id] = escola.nome;
+          });
+        }
+      }
+
+      const turmasMap: Record<string, { nome: string; ano?: string | null }> = {};
+      if (turmaIds.length > 0) {
+        const { data: turmasData, error: turmasError } = await supabase
+          .from("turmas")
+          .select("id, nome, ano")
+          .in("id", turmaIds);
+
+        if (turmasError) {
+          if ((turmasError as any)?.code === "42P01") {
+            toast.info("Tabela de turmas não encontrada. Rode as migrações para liberar este vínculo.");
+          } else {
+            throw turmasError;
+          }
+        } else {
+          (turmasData || []).forEach((turma) => {
+            turmasMap[turma.id] = { nome: turma.nome, ano: turma.ano };
+          });
+        }
+      }
+
+      const formatted: ProfileRow[] = profilesData.map((row) => ({
         ...row,
         name: row.name ?? "Sem nome",
+        escola_nome: row.escola_id ? escolasMap[row.escola_id] : undefined,
+        turma_nome: row.turma_id ? turmasMap[row.turma_id]?.nome : undefined,
+        turma_ano: row.turma_id ? turmasMap[row.turma_id]?.ano : undefined,
       }));
 
       setUsers(formatted);
@@ -179,6 +240,9 @@ export default function AdminUsersPage() {
 
       if (error) throw error;
 
+      const selectedSchoolName = dialogSchools.find((school) => school.id === dialogSchoolId)?.nome;
+      const selectedClass = dialogTurmas.find((turma) => turma.id === dialogClassId);
+
       setUsers((prev) =>
         prev.map((u) =>
           u.id === selectedUser.id
@@ -188,6 +252,9 @@ export default function AdminUsersPage() {
                 user_type: formValues.user_type,
                 escola_id: dialogSchoolId || null,
                 turma_id: dialogClassId || null,
+                escola_nome: dialogSchoolId ? selectedSchoolName || u.escola_nome : u.escola_nome,
+                turma_nome: dialogClassId ? selectedClass?.nome || u.turma_nome : u.turma_nome,
+                turma_ano: dialogClassId ? selectedClass?.ano || u.turma_ano : u.turma_ano,
               }
             : u
         )
@@ -252,6 +319,7 @@ export default function AdminUsersPage() {
                   <TableHead>Deficiência</TableHead>
                   <TableHead>Escola</TableHead>
                   <TableHead>Turma</TableHead>
+                  <TableHead>Turno</TableHead>
                   <TableHead>ID</TableHead>
                   <TableHead>Cadastro</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
@@ -299,7 +367,14 @@ export default function AdminUsersPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        {item.escola_id ? (
+                        {item.escola_nome ? (
+                          <Badge
+                            variant="outline"
+                            className="capitalize border-secondary/30 text-secondary bg-secondary/10"
+                          >
+                            {item.escola_nome}
+                          </Badge>
+                        ) : item.escola_id ? (
                           <span className="text-xs font-mono text-muted-foreground">
                             {item.escola_id.slice(0, 6)}...
                           </span>
@@ -308,10 +383,30 @@ export default function AdminUsersPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        {item.turma_id ? (
+                        {item.turma_nome ? (
+                          <Badge
+                            variant="outline"
+                            className="capitalize border-accent/30 text-accent bg-accent/10"
+                          >
+                            {item.turma_nome}
+                            {item.turma_ano ? ` • ${item.turma_ano}` : ""}
+                          </Badge>
+                        ) : item.turma_id ? (
                           <span className="text-xs font-mono text-muted-foreground">
                             {item.turma_id.slice(0, 6)}...
                           </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">Não informado</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {item.turno ? (
+                          <Badge
+                            variant="outline"
+                            className="capitalize border-primary/30 text-primary bg-primary/10"
+                          >
+                            {item.turno}
+                          </Badge>
                         ) : (
                           <span className="text-xs text-muted-foreground">Não informado</span>
                         )}

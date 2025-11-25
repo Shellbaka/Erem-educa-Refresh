@@ -124,8 +124,6 @@ export default function ProfilePage() {
       title="Meu Perfil"
       subtitle={profile.name || user.user_metadata?.name || user.email}
       description={profile.user_type ? `Tipo de usuário: ${profile.user_type}` : undefined}
-      user={user}
-      profile={profile}
       infoSlot={
         <div className="flex flex-col gap-2 text-sm text-muted-foreground pt-2">
           <div>
@@ -139,8 +137,6 @@ export default function ProfilePage() {
           </div>
         </div>
       }
-      user={user}
-      profile={profile}
       actions={
         <div className="flex items-center gap-2">
           <Button onClick={handleSave} disabled={isSaving || !selectedSchool || !selectedClass}>

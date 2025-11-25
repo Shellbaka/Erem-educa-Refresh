@@ -67,35 +67,46 @@ export default function Landing() {
             </div>
 
             <div className="relative max-w-xl mx-auto">
-              <div className="absolute -top-6 -left-6 w-20 h-20 rounded-3xl bg-primary/10" />
-              <div className="absolute -bottom-8 -right-8 w-24 h-24 rounded-full bg-secondary/10" />
+              <div className="absolute -top-6 -left-6 w-24 h-24 rounded-3xl bg-primary/10 blur-2xl" />
+              <div className="absolute -bottom-10 -right-10 w-32 h-32 rounded-full bg-secondary/10 blur-2xl" />
               <Card className="relative p-6 md:p-8 bg-gradient-to-br from-background to-muted/60 shadow-2xl border-primary/10">
-                <div className="grid grid-cols-2 gap-4 md:gap-6">
-                  <div className="space-y-4">
-                    <div className="h-24 md:h-28 rounded-2xl bg-primary/10 flex flex-col items-center justify-center border border-primary/20">
-                      <BookOpen className="h-9 w-9 text-primary mb-1" />
-                      <p className="text-xs font-medium text-primary">Livros digitais</p>
-                    </div>
-                    <div className="h-24 md:h-28 rounded-2xl bg-secondary/10 flex flex-col items-center justify-center border border-secondary/20">
-                      <GraduationCap className="h-9 w-9 text-secondary mb-1" />
-                      <p className="text-xs font-medium text-secondary">Salas de aula</p>
-                    </div>
-                  </div>
-                  <div className="space-y-4 translate-y-6 md:translate-y-8">
-                    <div className="h-24 md:h-28 rounded-2xl bg-accent/10 flex flex-col items-center justify-center border border-accent/20">
-                      <Users className="h-9 w-9 text-accent mb-1" />
-                      <p className="text-xs font-medium text-accent text-center">Estudantes e professores</p>
-                    </div>
-                    <div className="h-24 md:h-28 rounded-2xl bg-emerald-100/70 dark:bg-emerald-900/40 flex flex-col items-center justify-center border border-emerald-400/40">
-                      <span className="text-3xl mb-1">📚</span>
-                      <p className="text-xs font-medium text-emerald-800 dark:text-emerald-100 text-center">
-                        Plataforma de estudos
-                      </p>
-                    </div>
-                  </div>
+                <div className="grid grid-cols-2 gap-5">
+                  {[
+                    {
+                      src: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80",
+                      label: "Materiais e livros",
+                    },
+                    {
+                      src: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=600&q=80",
+                      label: "Estudantes conectados",
+                    },
+                    {
+                      src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
+                      label: "Professoras em ação",
+                    },
+                    {
+                      src: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
+                      label: "Tecnologia na sala",
+                    },
+                  ].map((item, idx) => (
+                    <figure
+                      key={item.label}
+                      className={`rounded-2xl overflow-hidden shadow-lg border border-white/30 bg-white/40 backdrop-blur ${idx % 2 !== 0 ? "translate-y-6" : ""}`}
+                    >
+                      <img
+                        src={item.src}
+                        alt={item.label}
+                        className="object-cover h-40 w-full"
+                        loading="lazy"
+                      />
+                      <figcaption className="p-3 text-xs font-medium text-muted-foreground text-center">
+                        {item.label}
+                      </figcaption>
+                    </figure>
+                  ))}
                 </div>
                 <p className="mt-6 text-xs md:text-sm text-muted-foreground text-center">
-                  Ícones de livros, estudantes e escola para indicar visualmente que esta é uma plataforma educacional.
+                  Fotografias reais de livros, estudantes e ambientes escolares para reforçar visualmente a proposta educacional.
                 </p>
               </Card>
             </div>

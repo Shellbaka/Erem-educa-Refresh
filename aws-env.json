@@ -1,0 +1,8 @@
+{
+  "SUPABASE_URL": "https://your-project.supabase.co",
+  "SUPABASE_ANON_KEY": "public-anon-key",
+  "S3_BUCKET": "your-s3-bucket-name",
+  "AWS_REGION": "us-east-1",
+  "API_STAGE": "prod"
+}
+

@@ -1,0 +1,11 @@
+{
+  "name": "erem-educa-refresh-lambda",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "handlers/healthCheckHandler.js",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.680.0",
+    "@supabase/supabase-js": "^2.78.0"
+  }
+}
+

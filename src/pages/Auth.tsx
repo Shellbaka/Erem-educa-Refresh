@@ -23,6 +23,7 @@ export default function Auth() {
   const [turmas, setTurmas] = useState<Array<{ id: string; nome: string; ano: string | null }>>([]);
   const [isLoadingClasses, setIsLoadingClasses] = useState(false);
   const [classId, setClassId] = useState<string>("");
+  const [turno, setTurno] = useState<string>("manha");
 
   useEffect(() => {
     const loadSchools = async () => {
@@ -146,6 +147,7 @@ export default function Auth() {
             deficiencia: deficiency !== "none" ? deficiency : null,
             escola_id: schoolId,
             turma_id: classId,
+            turno,
           },
         },
       });
@@ -162,6 +164,7 @@ export default function Auth() {
             deficiencia: deficiency !== "none" ? deficiency : null,
             escola_id: schoolId,
             turma_id: classId,
+            turno,
           });
 
         if (profileError) throw profileError;
@@ -307,6 +310,42 @@ export default function Auth() {
                         <SelectItem value="admin">Administrador(a)</SelectItem>
                       </SelectContent>
                     </Select>
+                    <div className="mt-3 grid grid-cols-2 gap-2" aria-label="Atalhos visuais de ação">
+                      <Button
+                        type="button"
+                        className="h-11 text-base font-semibold bg-red-600 hover:bg-red-700 text-white"
+                        onClick={() => {
+                          const loginTab = document.querySelector('[value="login"]') as HTMLElement;
+                          loginTab?.click();
+                        }}
+                      >
+                        🔴 Entrar
+                      </Button>
+                      <Button
+                        type="button"
+                        className="h-11 text-base font-semibold bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={() => {
+                          const signupTab = document.querySelector('[value="signup"]') as HTMLElement;
+                          signupTab?.click();
+                        }}
+                      >
+                        🔵 Criar conta
+                      </Button>
+                      <Button
+                        type="button"
+                        className="h-11 text-base font-semibold bg-green-600 hover:bg-green-700 text-white col-span-2"
+                        onClick={() => document.getElementById("deficiency")?.focus()}
+                      >
+                        🟢 Acessibilidade visual
+                      </Button>
+                      <Button
+                        asChild
+                        type="button"
+                        className="h-11 text-base font-semibold bg-yellow-500 hover:bg-yellow-600 text-black col-span-2"
+                      >
+                        <Link to="/">🟡 Voltar para o início</Link>
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -321,6 +360,20 @@ export default function Auth() {
                             {option.label}
                           </SelectItem>
                         ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="turno">Turno</Label>
+                    <Select value={turno} onValueChange={setTurno} required>
+                      <SelectTrigger id="turno" aria-required="true">
+                        <SelectValue placeholder="Selecione o turno" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="manha">Manhã</SelectItem>
+                        <SelectItem value="tarde">Tarde</SelectItem>
+                        <SelectItem value="noite">Noite</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

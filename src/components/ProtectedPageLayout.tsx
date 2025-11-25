@@ -4,6 +4,8 @@ import { UserProfileMenu } from "@/components/UserProfileMenu";
 import type { Profile } from "@/hooks/useCurrentUser";
 import { useDeficiencyTheme } from "@/hooks/useDeficiencyTheme";
 import { Badge } from "@/components/ui/badge";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface ProtectedPageLayoutProps {
   title: string;
@@ -28,6 +30,7 @@ export function ProtectedPageLayout({
   infoSlot,
   showUserInfo = true,
 }: ProtectedPageLayoutProps) {
+  const navigate = useNavigate();
   useDeficiencyTheme(profile?.deficiencia ?? user.user_metadata?.deficiencia);
 
   const defaultInfo = (() => {
@@ -75,6 +78,15 @@ export function ProtectedPageLayout({
   return (
     <div className="min-h-screen">
       <div className="container mx-auto px-4 pt-20 pb-10">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Voltar para a página anterior"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar
+        </button>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between mb-10">
           <div className="max-w-2xl space-y-2">
             <div className="space-y-1">

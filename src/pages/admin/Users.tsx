@@ -30,19 +30,6 @@ import { fetchEscolas, fetchTurmas } from "@/services/user";
 
 type ProfileRow = Profile & {
   email?: string | null;
-  turma?: {
-    id: string;
-    nome: string;
-    ano?: string | null;
-    escola?: {
-      id: string;
-      nome: string;
-    } | null;
-  } | null;
-  escola?: {
-    id: string;
-    nome: string;
-  } | null;
 };
 
 export default function AdminUsersPage() {
@@ -117,9 +104,7 @@ export default function AdminUsersPage() {
           turma_id,
           escola_id,
           created_at,
-          avatar_url,
-          turma:turma_id ( id, nome, ano, escola:escola_id ( id, nome ) ),
-          escola:escola_id ( id, nome )
+          avatar_url
         `)
         .order("created_at", { ascending: false });
 
@@ -194,9 +179,6 @@ export default function AdminUsersPage() {
 
       if (error) throw error;
 
-      const selectedSchoolName = dialogSchools.find((school) => school.id === dialogSchoolId)?.nome;
-      const selectedClass = dialogTurmas.find((turma) => turma.id === dialogClassId);
-
       setUsers((prev) =>
         prev.map((u) =>
           u.id === selectedUser.id
@@ -206,25 +188,6 @@ export default function AdminUsersPage() {
                 user_type: formValues.user_type,
                 escola_id: dialogSchoolId || null,
                 turma_id: dialogClassId || null,
-                escola: dialogSchoolId
-                  ? {
-                      id: dialogSchoolId,
-                      nome: selectedSchoolName || u.escola?.nome || u.turma?.escola?.nome || "",
-                    }
-                  : null,
-                turma: dialogClassId
-                  ? {
-                      id: dialogClassId,
-                      nome: selectedClass?.nome || "",
-                      ano: selectedClass?.ano || null,
-                      escola: dialogSchoolId
-                        ? {
-                            id: dialogSchoolId,
-                            nome: selectedSchoolName || u.escola?.nome || u.turma?.escola?.nome || "",
-                          }
-                        : null,
-                    }
-                  : null,
               }
             : u
         )
@@ -336,26 +299,19 @@ export default function AdminUsersPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        {item.escola?.nome || item.turma?.escola?.nome ? (
-                          <Badge
-                            variant="outline"
-                            className="capitalize border-secondary/30 text-secondary bg-secondary/10"
-                          >
-                            {item.escola?.nome || item.turma?.escola?.nome}
-                          </Badge>
+                        {item.escola_id ? (
+                          <span className="text-xs font-mono text-muted-foreground">
+                            {item.escola_id.slice(0, 6)}...
+                          </span>
                         ) : (
                           <span className="text-xs text-muted-foreground">Não informado</span>
                         )}
                       </TableCell>
                       <TableCell>
-                        {item.turma?.nome ? (
-                          <Badge
-                            variant="outline"
-                            className="capitalize border-accent/30 text-accent bg-accent/10"
-                          >
-                            {item.turma.nome}
-                            {item.turma.ano ? ` • ${item.turma.ano}` : ""}
-                          </Badge>
+                        {item.turma_id ? (
+                          <span className="text-xs font-mono text-muted-foreground">
+                            {item.turma_id.slice(0, 6)}...
+                          </span>
                         ) : (
                           <span className="text-xs text-muted-foreground">Não informado</span>
                         )}

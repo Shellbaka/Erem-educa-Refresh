@@ -19,7 +19,8 @@ create table if not exists public.turmas (
 alter table public.profiles
   add column if not exists deficiencia text check (deficiencia in ('Visual','Auditiva')),
   add column if not exists turma_id uuid references public.turmas(id) on delete set null,
-  add column if not exists escola_id uuid references public.escolas(id) on delete set null;
+  add column if not exists escola_id uuid references public.escolas(id) on delete set null,
+  add column if not exists turno text check (turno in ('manha','tarde','noite'));
 
 -- Enable row level security and basic policies for escolas
 alter table public.escolas enable row level security;

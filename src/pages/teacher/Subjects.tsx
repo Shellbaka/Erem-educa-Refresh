@@ -1,10 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ProtectedPageLayout } from "@/components/ProtectedPageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Users, FolderOpen } from "lucide-react";
@@ -37,6 +40,12 @@ export default function TeacherSubjectsPage() {
   const [isFetching, setIsFetching] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [studentsByClass, setStudentsByClass] = useState<Record<string, StudentProfile[]>>({});
+  const [turmas, setTurmas] = useState<Array<{ id: string; nome: string; ano?: string | null }>>([]);
+  const [isLoadingTurmas, setIsLoadingTurmas] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [newSubjectName, setNewSubjectName] = useState("");
+  const [newSubjectDescription, setNewSubjectDescription] = useState("");
+  const [newSubjectClassId, setNewSubjectClassId] = useState<string>("");
 
   useEffect(() => {
     if (!isLoading) {
@@ -47,6 +56,30 @@ export default function TeacherSubjectsPage() {
       }
     }
   }, [isLoading, navigate, profile?.user_type, user]);
+
+  // Carrega turmas da escola do professor (se houver vínculo)
+  useEffect(() => {
+    const loadTurmas = async () => {
+      if (!user || !profile?.escola_id) return;
+      try {
+        setIsLoadingTurmas(true);
+        const { data, error } = await supabase
+          .from("turmas")
+          .select("id, nome, ano")
+          .eq("escola_id", profile.escola_id)
+          .order("nome", { ascending: true });
+
+        if (error) throw error;
+        setTurmas((data || []) as Array<{ id: string; nome: string; ano?: string | null }>);
+      } catch (error: any) {
+        toast.error(error.message || "Erro ao carregar turmas para cadastro de matérias");
+      } finally {
+        setIsLoadingTurmas(false);
+      }
+    };
+
+    loadTurmas();
+  }, [profile?.escola_id, user]);
 
   useEffect(() => {
     const load = async () => {
@@ -109,6 +142,67 @@ export default function TeacherSubjectsPage() {
     load();
   }, [user]);
 
+  const handleCreateSubject = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!user) return;
+
+    if (!newSubjectName.trim()) {
+      toast.error("Informe o nome da matéria");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { data, error } = await supabase
+        .from("materias")
+        .insert({
+          nome: newSubjectName.trim(),
+          descricao: newSubjectDescription.trim() || null,
+          turma_id: newSubjectClassId || null,
+          teacher_id: user.id,
+        })
+        .select(`
+          id,
+          nome,
+          descricao,
+          turma:turma_id (
+            id,
+            nome,
+            ano,
+            escola:escola_id ( id, nome )
+          )
+        `)
+        .single();
+
+      if (error) throw error;
+
+      const created = data as Subject;
+      setSubjects((prev) => [...prev, created]);
+      setNewSubjectName("");
+      setNewSubjectDescription("");
+      setNewSubjectClassId("");
+      toast.success("Matéria cadastrada com sucesso!");
+    } catch (error: any) {
+      toast.error(error.message || "Não foi possível cadastrar a matéria");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteSubject = async (id: string) => {
+    if (!confirm("Tem certeza que deseja remover esta matéria?")) return;
+
+    try {
+      const { error } = await supabase.from("materias").delete().eq("id", id);
+      if (error) throw error;
+
+      setSubjects((prev) => prev.filter((s) => s.id !== id));
+      toast.success("Matéria removida com sucesso!");
+    } catch (error: any) {
+      toast.error(error.message || "Não foi possível remover a matéria");
+    }
+  };
+
   const totalStudents = useMemo(() => {
     return Object.values(studentsByClass).reduce((acc, list) => acc + list.length, 0);
   }, [studentsByClass]);
@@ -133,6 +227,68 @@ export default function TeacherSubjectsPage() {
         </Badge>
       }
     >
+      <Card className="shadow-school-lg">
+        <CardHeader className="bg-gradient-to-br from-primary/10 to-secondary/10">
+          <CardTitle className="flex items-center justify-between gap-2 text-primary">
+            <span className="flex items-center gap-2">
+              <FolderOpen className="h-5 w-5" /> Cadastrar nova matéria
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <form onSubmit={handleCreateSubject} className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2 md:col-span-1">
+              <Label htmlFor="subject-name">Nome da matéria</Label>
+              <Input
+                id="subject-name"
+                value={newSubjectName}
+                onChange={(e) => setNewSubjectName(e.target.value)}
+                placeholder="Ex: Matemática, Português..."
+                required
+              />
+            </div>
+            <div className="space-y-2 md:col-span-1">
+              <Label htmlFor="subject-class">Turma (opcional)</Label>
+              <select
+                id="subject-class"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                value={newSubjectClassId}
+                onChange={(e) => setNewSubjectClassId(e.target.value)}
+                disabled={isLoadingTurmas || turmas.length === 0}
+              >
+                <option value="">
+                  {isLoadingTurmas
+                    ? "Carregando turmas..."
+                    : turmas.length === 0
+                    ? "Nenhuma turma encontrada para sua escola"
+                    : "Selecione uma turma (opcional)"}
+                </option>
+                {turmas.map((turma) => (
+                  <option key={turma.id} value={turma.id}>
+                    {turma.nome}
+                    {turma.ano ? ` • ${turma.ano}` : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="subject-description">Descrição (opcional)</Label>
+              <Input
+                id="subject-description"
+                value={newSubjectDescription}
+                onChange={(e) => setNewSubjectDescription(e.target.value)}
+                placeholder="Breve descrição da matéria ou do conteúdo trabalhado"
+              />
+            </div>
+            <div className="md:col-span-2 flex justify-end">
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? "Salvando..." : "Salvar matéria"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
       {isFetching ? (
         <div className="w-full py-16 flex items-center justify-center text-muted-foreground">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" aria-label="Carregando" />
@@ -200,6 +356,18 @@ export default function TeacherSubjectsPage() {
                       ))}
                     </div>
                   )}
+
+                  <div className="pt-4 flex justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="border-destructive/40 text-destructive hover:bg-destructive hover:text-white"
+                      onClick={() => handleDeleteSubject(subject.id)}
+                    >
+                      Remover matéria
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             );

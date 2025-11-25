@@ -23,45 +23,81 @@ export default function Landing() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 gradient-hero opacity-10" />
         <div className="container mx-auto px-4 py-20 relative">
-          <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-light rounded-full text-sm font-medium text-primary">
-              <Heart className="h-4 w-4" />
-              Educação Inclusiva e Acessível
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold text-balance">
-              Bem-vindo ao{" "}
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Erem Conecta
-              </span>
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto text-balance">
-              Uma plataforma educacional projetada para todos, com foco especial em estudantes com deficiência. Juntos, tornamos a educação mais acessível.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
-                asChild 
-                size="lg"
-                className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all"
-              >
-                <Link to="/auth">
-                  Começar agora
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="max-w-xl mx-auto text-center lg:text-left space-y-8 animate-fade-in">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-light rounded-full text-sm font-medium text-primary">
+                <Heart className="h-4 w-4" />
+                Educação Inclusiva e Acessível
+              </div>
               
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="text-lg px-8 py-6"
-                asChild
-              >
-                <a href="#features">
-                  Conhecer recursos
-                </a>
-              </Button>
+              <h1 className="text-5xl md:text-7xl font-bold text-balance">
+                Bem-vindo ao{" "}
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Erem Conecta
+                </span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl text-balance">
+                Uma plataforma educacional projetada para todos, com foco especial em estudantes com deficiência. Juntos, tornamos a educação mais acessível.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
+                <Button 
+                  asChild 
+                  size="lg"
+                  className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all"
+                >
+                  <Link to="/auth">
+                    Começar agora
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="text-lg px-8 py-6"
+                  asChild
+                >
+                  <a href="#features">
+                    Conhecer recursos
+                  </a>
+                </Button>
+              </div>
+            </div>
+
+            <div className="relative max-w-xl mx-auto">
+              <div className="absolute -top-6 -left-6 w-20 h-20 rounded-3xl bg-primary/10" />
+              <div className="absolute -bottom-8 -right-8 w-24 h-24 rounded-full bg-secondary/10" />
+              <Card className="relative p-6 md:p-8 bg-gradient-to-br from-background to-muted/60 shadow-2xl border-primary/10">
+                <div className="grid grid-cols-2 gap-4 md:gap-6">
+                  <div className="space-y-4">
+                    <div className="h-24 md:h-28 rounded-2xl bg-primary/10 flex flex-col items-center justify-center border border-primary/20">
+                      <BookOpen className="h-9 w-9 text-primary mb-1" />
+                      <p className="text-xs font-medium text-primary">Livros digitais</p>
+                    </div>
+                    <div className="h-24 md:h-28 rounded-2xl bg-secondary/10 flex flex-col items-center justify-center border border-secondary/20">
+                      <GraduationCap className="h-9 w-9 text-secondary mb-1" />
+                      <p className="text-xs font-medium text-secondary">Salas de aula</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4 translate-y-6 md:translate-y-8">
+                    <div className="h-24 md:h-28 rounded-2xl bg-accent/10 flex flex-col items-center justify-center border border-accent/20">
+                      <Users className="h-9 w-9 text-accent mb-1" />
+                      <p className="text-xs font-medium text-accent text-center">Estudantes e professores</p>
+                    </div>
+                    <div className="h-24 md:h-28 rounded-2xl bg-emerald-100/70 dark:bg-emerald-900/40 flex flex-col items-center justify-center border border-emerald-400/40">
+                      <span className="text-3xl mb-1">📚</span>
+                      <p className="text-xs font-medium text-emerald-800 dark:text-emerald-100 text-center">
+                        Plataforma de estudos
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-6 text-xs md:text-sm text-muted-foreground text-center">
+                  Ícones de livros, estudantes e escola para indicar visualmente que esta é uma plataforma educacional.
+                </p>
+              </Card>
             </div>
           </div>
         </div>

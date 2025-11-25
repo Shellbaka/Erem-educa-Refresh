@@ -20,6 +20,8 @@ import TeacherActivities from "./pages/teacher/Activities";
 import TeacherSubjectsPage from "./pages/teacher/Subjects";
 import TodosPage from "./pages/Todos";
 import AdminUsersPage from "./pages/admin/Users";
+import AdminReportsPage from "./pages/admin/Reports";
+import AdminSettingsPage from "./pages/admin/Settings";
 import ProfilePage from "./pages/Profile";
 
 const queryClient = new QueryClient();
@@ -51,6 +53,8 @@ const App = () => (
           <Route path="/professor/materias" element={<TeacherSubjectsPage />} />
           {/* Admin routes */}
           <Route path="/admin/users" element={<AdminUsersPage />} />
+          <Route path="/admin/reports" element={<AdminReportsPage />} />
+          <Route path="/admin/settings" element={<AdminSettingsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -248,8 +248,15 @@ export default function Dashboard() {
           {/* Admin Dashboard */}
           {userType === "admin" && (
             <>
-              <Link to="/admin/users" className="block focus:outline-none focus:ring-2 focus:ring-primary rounded-md" aria-label="Ir para gestão de usuários">
-                <Card className="card-school shadow-school hover:shadow-school-lg transition-all cursor-pointer" role="link">
+              <Link
+                to="/admin/users"
+                className="block focus:outline-none focus:ring-2 focus:ring-primary rounded-md"
+                aria-label="Ir para gestão de usuários"
+              >
+                <Card
+                  className="card-school shadow-school hover:shadow-school-lg transition-all cursor-pointer"
+                  role="link"
+                >
                   <CardHeader className="bg-gradient-to-br from-primary/10 to-secondary/5">
                     <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-3 shadow-md">
                       <Users className="h-7 w-7 text-white" />
@@ -262,29 +269,47 @@ export default function Dashboard() {
                 </Card>
               </Link>
 
-              <Card className="card-school shadow-school hover:shadow-school-lg transition-all cursor-pointer">
-                <CardHeader className="bg-gradient-to-br from-secondary/10 to-primary/5">
-                  <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-secondary to-secondary/80 flex items-center justify-center mb-3 shadow-md">
-                    <TrendingUp className="h-7 w-7 text-white" />
-                  </div>
-                  <CardTitle className="text-xl font-semibold text-secondary">Relatórios</CardTitle>
-                  <CardDescription className="text-base">
-                    Visualize métricas e indicadores da plataforma
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link
+                to="/admin/reports"
+                className="block focus:outline-none focus:ring-2 focus:ring-secondary rounded-md"
+                aria-label="Ir para Relatórios"
+              >
+                <Card
+                  className="card-school shadow-school hover:shadow-school-lg transition-all cursor-pointer"
+                  role="link"
+                >
+                  <CardHeader className="bg-gradient-to-br from-secondary/10 to-primary/5">
+                    <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-secondary to-secondary/80 flex items-center justify-center mb-3 shadow-md">
+                      <TrendingUp className="h-7 w-7 text-white" />
+                    </div>
+                    <CardTitle className="text-xl font-semibold text-secondary">Relatórios</CardTitle>
+                    <CardDescription className="text-base">
+                      Visualize métricas de uso e indicadores (exemplo)
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
 
-              <Card className="card-school shadow-school hover:shadow-school-lg transition-all cursor-pointer">
-                <CardHeader className="bg-gradient-to-br from-accent/10 to-primary/5">
-                  <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center mb-3 shadow-md">
-                    <Settings className="h-7 w-7 text-white" />
-                  </div>
-                  <CardTitle className="text-xl font-semibold text-accent">Configurações</CardTitle>
-                  <CardDescription className="text-base">
-                    Configure a plataforma e sistema
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link
+                to="/admin/settings"
+                className="block focus:outline-none focus:ring-2 focus:ring-accent rounded-md"
+                aria-label="Ir para Configurações"
+              >
+                <Card
+                  className="card-school shadow-school hover:shadow-school-lg transition-all cursor-pointer"
+                  role="link"
+                >
+                  <CardHeader className="bg-gradient-to-br from-accent/10 to-primary/5">
+                    <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center mb-3 shadow-md">
+                      <Settings className="h-7 w-7 text-white" />
+                    </div>
+                    <CardTitle className="text-xl font-semibold text-accent">Configurações</CardTitle>
+                    <CardDescription className="text-base">
+                      Ajuste opções da plataforma (exemplo)
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
             </>
           )}
         </div>

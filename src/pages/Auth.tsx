@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ export default function Auth() {
   const [classId, setClassId] = useState<string>("");
   const [turno, setTurno] = useState<string>("manha");
   const [hasWarnedAboutLegacyProfile, setHasWarnedAboutLegacyProfile] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const upsertProfileWithFallback = async (payload: Record<string, any>) => {
     const attempt = async (body: Record<string, any>, allowRetry: boolean) => {
       const { error } = await supabase.from("profiles").upsert(body);
@@ -112,6 +113,13 @@ export default function Auth() {
     }
   }, [userType]);
 
+  // Garantir que turno tenha valor padrão quando for estudante
+  useEffect(() => {
+    if (userType === "student" && !turno) {
+      setTurno("manha");
+    }
+  }, [userType]);
+
   const deficiencyOptions = useMemo(
     () => [
       { value: "none", label: "Nenhuma" },
@@ -149,34 +157,44 @@ export default function Auth() {
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const name = formData.get("name") as string;
-
-    if (!userType) {
-      toast.error("Por favor, selecione seu perfil");
-      setIsLoading(false);
-      return;
-    }
-
-    // Validação condicional: apenas alunos precisam de escola e turma
-    if (userType === "student") {
-      if (!schoolId) {
-        toast.error("Selecione a escola");
-        setIsLoading(false);
-        return;
-      }
-
-      if (!classId) {
-        toast.error("Selecione a turma");
-        setIsLoading(false);
-        return;
-      }
-    }
+    setError(null);
 
     try {
+      const formData = new FormData(e.currentTarget);
+      const email = formData.get("email") as string;
+      const password = formData.get("password") as string;
+      const name = formData.get("name") as string;
+
+      if (!userType) {
+        setError("Por favor, selecione seu perfil");
+        toast.error("Por favor, selecione seu perfil");
+        setIsLoading(false);
+        return;
+      }
+
+      // Validação condicional: apenas alunos precisam de escola e turma
+      if (userType === "student") {
+        if (!schoolId) {
+          setError("Selecione a escola");
+          toast.error("Selecione a escola");
+          setIsLoading(false);
+          return;
+        }
+
+        if (!classId) {
+          setError("Selecione a turma");
+          toast.error("Selecione a turma");
+          setIsLoading(false);
+          return;
+        }
+
+        if (!turno) {
+          setError("Selecione o turno");
+          toast.error("Selecione o turno");
+          setIsLoading(false);
+          return;
+        }
+      }
       // Preparar dados do perfil baseado no tipo de usuário
       const profileData: Record<string, any> = {
         name,
@@ -219,6 +237,7 @@ export default function Auth() {
       }
 
       toast.success("Conta criada com sucesso! Você já pode fazer login.");
+      setError(null);
       setTimeout(() => {
         setActiveTab("login");
         // Limpar formulário
@@ -230,7 +249,9 @@ export default function Auth() {
       }, 1500);
     } catch (error: any) {
       console.error("Erro ao criar conta:", error);
-      toast.error(error.message || "Erro ao criar conta. Tente novamente.");
+      const errorMessage = error.message || "Erro ao criar conta. Tente novamente.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -269,7 +290,7 @@ export default function Auth() {
               </TabsList>
             </CardHeader>
 
-            <CardContent className="pt-6">
+            <CardContent className="pt-6 relative z-10">
               <TabsContent value="login" className="mt-0">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
@@ -309,8 +330,13 @@ export default function Auth() {
                 </form>
               </TabsContent>
 
-              <TabsContent value="signup" className="mt-0">
-                <form onSubmit={handleSignup} className="space-y-4">
+              <TabsContent value="signup" className="mt-0 relative z-10">
+                {error && (
+                  <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md text-sm text-destructive">
+                    {error}
+                  </div>
+                )}
+                <form onSubmit={handleSignup} className="space-y-4" key={userType}>
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Nome completo</Label>
                     <Input
@@ -416,11 +442,15 @@ export default function Auth() {
                   </div>
 
                   {/* Campos específicos para ALUNOS: Turno, Escola e Turma */}
-                  {userType === "student" && (
+                  {userType === "student" && activeTab === "signup" ? (
                     <>
                       <div className="space-y-2">
                         <Label htmlFor="turno">Turno <span className="text-destructive">*</span></Label>
-                        <Select value={turno} onValueChange={setTurno} required>
+                        <Select 
+                          value={turno || "manha"} 
+                          onValueChange={(value) => setTurno(value)} 
+                          required
+                        >
                           <SelectTrigger id="turno" aria-required="true">
                             <SelectValue placeholder="Selecione o turno" />
                           </SelectTrigger>
@@ -435,25 +465,29 @@ export default function Auth() {
                       <div className="space-y-2">
                         <Label htmlFor="school">Escola <span className="text-destructive">*</span></Label>
                         <Select
-                          value={schoolId}
+                          value={schoolId || ""}
                           onValueChange={(value) => {
                             setSchoolId(value);
                             setClassId("");
                           }}
                           required
+                          disabled={isLoadingSchools}
                         >
-                          <SelectTrigger id="school" aria-required="true">
+                          <SelectTrigger id="school" aria-required="true" disabled={isLoadingSchools}>
                             <SelectValue placeholder={isLoadingSchools ? "Carregando escolas..." : "Selecione a escola"} />
                           </SelectTrigger>
                           <SelectContent>
-                            {schools.length === 0 && !isLoadingSchools ? (
+                            {isLoadingSchools ? (
+                              <SelectItem value="" disabled>Carregando...</SelectItem>
+                            ) : schools.length === 0 ? (
                               <SelectItem value="" disabled>Nenhuma escola cadastrada</SelectItem>
-                            ) : null}
-                            {schools.map((school) => (
-                              <SelectItem key={school.id} value={school.id}>
-                                {school.nome}
-                              </SelectItem>
-                            ))}
+                            ) : (
+                              schools.map((school) => (
+                                <SelectItem key={school.id} value={school.id}>
+                                  {school.nome}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                       </div>
@@ -461,12 +495,12 @@ export default function Auth() {
                       <div className="space-y-2">
                         <Label htmlFor="class">Turma <span className="text-destructive">*</span></Label>
                         <Select
-                          value={classId}
-                          onValueChange={setClassId}
+                          value={classId || ""}
+                          onValueChange={(value) => setClassId(value)}
                           required
                           disabled={!schoolId || isLoadingClasses}
                         >
-                          <SelectTrigger id="class" aria-required="true">
+                          <SelectTrigger id="class" aria-required="true" disabled={!schoolId || isLoadingClasses}>
                             <SelectValue placeholder={
                               !schoolId
                                 ? "Selecione uma escola primeiro"
@@ -476,20 +510,25 @@ export default function Auth() {
                             } />
                           </SelectTrigger>
                           <SelectContent>
-                            {turmas.length === 0 && !isLoadingClasses ? (
+                            {isLoadingClasses ? (
+                              <SelectItem value="" disabled>Carregando...</SelectItem>
+                            ) : !schoolId ? (
+                              <SelectItem value="" disabled>Selecione uma escola primeiro</SelectItem>
+                            ) : turmas.length === 0 ? (
                               <SelectItem value="" disabled>Nenhuma turma cadastrada</SelectItem>
-                            ) : null}
-                            {turmas.map((turma) => (
-                              <SelectItem key={turma.id} value={turma.id}>
-                                {turma.nome}
-                                {turma.ano ? ` • ${turma.ano}` : ""}
-                              </SelectItem>
-                            ))}
+                            ) : (
+                              turmas.map((turma) => (
+                                <SelectItem key={turma.id} value={turma.id}>
+                                  {turma.nome}
+                                  {turma.ano ? ` • ${turma.ano}` : ""}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                       </div>
                     </>
-                  )}
+                  ) : null}
 
                   {/* Mensagem informativa para professores/admins */}
                   {(userType === "teacher" || userType === "admin") && (

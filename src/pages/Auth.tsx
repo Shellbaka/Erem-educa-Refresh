@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { AccessibilityBar } from "@/components/AccessibilityBar";
 import { ArrowLeft, GraduationCap } from "lucide-react";
 import { Link } from "react-router-dom";
+import { SchoolBackground } from "@/components/SchoolBackground";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -258,8 +259,9 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background flex items-center justify-center p-4">
-      <AccessibilityBar />
+    <SchoolBackground variant="textura">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <AccessibilityBar />
       
       <div className="w-full max-w-md space-y-6 animate-fade-in">
         <div className="text-center space-y-2">
@@ -555,6 +557,7 @@ export default function Auth() {
           Ao continuar, você concorda com nossos termos de uso e política de privacidade
         </p>
       </div>
-    </div>
+      </div>
+    </SchoolBackground>
   );
 }

@@ -13,10 +13,11 @@ import {
   Heart,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { SchoolBackground } from "@/components/SchoolBackground";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
+    <SchoolBackground variant="textura">
       <AccessibilityBar />
       
       {/* Hero Section */}
@@ -260,6 +261,6 @@ export default function Landing() {
           </p>
         </div>
       </footer>
-    </div>
+    </SchoolBackground>
   );
 }

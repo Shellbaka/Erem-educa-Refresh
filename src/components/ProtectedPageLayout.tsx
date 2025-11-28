@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
-import { UserProfileMenu } from "@/components/UserProfileMenu";
 import type { Profile } from "@/hooks/useCurrentUser";
 import { useDeficiencyTheme } from "@/hooks/useDeficiencyTheme";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ProtectedHeader } from "@/components/ProtectedHeader";
+import { useLogout } from "@/hooks/useLogout";
+import { SchoolBackground } from "@/components/SchoolBackground";
 
 interface ProtectedPageLayoutProps {
   title: string;
@@ -31,6 +33,7 @@ export function ProtectedPageLayout({
   showUserInfo = true,
 }: ProtectedPageLayoutProps) {
   const navigate = useNavigate();
+  const { handleLogout } = useLogout();
   useDeficiencyTheme(profile?.deficiencia ?? user.user_metadata?.deficiencia);
 
   const defaultInfo = (() => {
@@ -76,8 +79,9 @@ export function ProtectedPageLayout({
   })();
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto px-4 pt-20 pb-10">
+    <SchoolBackground variant="escola">
+      <ProtectedHeader user={user} profile={profile} onLogout={handleLogout} pageTitle={title} />
+      <div className="container mx-auto px-4 pt-8 pb-10">
         <button
           type="button"
           onClick={() => navigate(-1)}
@@ -90,19 +94,19 @@ export function ProtectedPageLayout({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between mb-10">
           <div className="max-w-2xl space-y-2">
             <div className="space-y-1">
-              <h1 className="text-3xl sm:text-4xl font-bold text-foreground">{title}</h1>
               {subtitle ? <div className="text-lg text-muted-foreground">{subtitle}</div> : null}
               {description ? <div className="text-sm text-muted-foreground">{description}</div> : null}
             </div>
             {infoSlot || defaultInfo}
           </div>
-          <div className="flex items-center gap-3 self-end lg:self-auto">
-            {actions}
-            <UserProfileMenu user={user} profile={profile ?? undefined} />
-          </div>
+          {actions ? (
+            <div className="flex items-center gap-3 self-end lg:self-auto">
+              {actions}
+            </div>
+          ) : null}
         </div>
         <div className="space-y-8">{children}</div>
       </div>
-    </div>
+    </SchoolBackground>
   );
 }

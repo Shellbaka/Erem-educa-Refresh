@@ -2,14 +2,12 @@ import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AccessibilityBar } from "@/components/AccessibilityBar";
 import { toast } from "sonner";
 import {
   BookOpen,
   TrendingUp,
   Users,
   Settings,
-  LogOut,
   GraduationCap,
   Calendar,
   MessageSquare,
@@ -17,9 +15,10 @@ import {
   BookOpenCheck,
 } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { UserProfileMenu } from "@/components/UserProfileMenu";
 import { useDeficiencyTheme } from "@/hooks/useDeficiencyTheme";
 import { Badge } from "@/components/ui/badge";
+import { ProtectedHeader } from "@/components/ProtectedHeader";
+import { SchoolBackground } from "@/components/SchoolBackground";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -57,40 +56,16 @@ export default function Dashboard() {
 
   const userType = profile?.user_type || user?.user_metadata?.user_type || "student";
   const userName = profile?.name || user?.user_metadata?.name || "Usuário";
-  const headerBg = userType === "student" ? "from-primary/20 to-primary/5" : userType === "teacher" ? "from-secondary/20 to-secondary/5" : "from-accent/20 to-accent/5";
   const escolaNome = profile?.escola?.nome || user.user_metadata?.escola_nome;
   const turmaNome = profile?.turma?.nome || user.user_metadata?.turma_nome;
   const turmaAno = profile?.turma?.ano;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background">
-      <AccessibilityBar />
-      
-      {/* Header */}
-      <header className={`border-b bg-gradient-to-r ${headerBg} backdrop-blur-sm sticky top-0 z-40`}>
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <GraduationCap className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold">Erem Conecta</h1>
-                <p className="text-sm text-muted-foreground">
-                  {userType === "student" && "Estudante"}
-                  {userType === "teacher" && "Professor(a)"}
-                  {userType === "admin" && "Administrador(a)"}
-                </p>
-              </div>
-            </div>
-            
-            <UserProfileMenu user={user} profile={profile ?? undefined} onLogout={handleLogout} />
-          </div>
-        </div>
-      </header>
+    <SchoolBackground variant="escola">
+      <ProtectedHeader user={user} profile={profile} onLogout={handleLogout} />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 pt-16 pb-8">
+      <main className="container mx-auto px-4 pt-8 pb-8">
         <div className="mb-10 animate-fade-in">
           <h2 className="text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Olá, {userName}! 👋
@@ -345,6 +320,6 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
-    </div>
+    </SchoolBackground>
   );
 }

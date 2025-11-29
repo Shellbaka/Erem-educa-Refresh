@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { AccessibilityBar } from "@/components/AccessibilityBar";
 import { ArrowLeft, GraduationCap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SchoolBackground } from "@/components/SchoolBackground";
@@ -105,10 +104,9 @@ export default function Auth() {
     loadTurmas();
   }, [schoolId]);
 
-  // Limpar escola/turma quando o tipo de usuário mudar para não-aluno
+  // Limpar turma quando o tipo de usuário mudar para não-aluno (mas manter escola)
   useEffect(() => {
     if (userType !== "student") {
-      setSchoolId("");
       setClassId("");
       setTurmas([]);
     }
@@ -201,16 +199,15 @@ export default function Auth() {
         name,
         user_type: userType,
         deficiencia: deficiency !== "none" ? deficiency : null,
+        escola_id: schoolId || null, // Todos os tipos de usuário podem ter escola
       };
 
-      // Apenas alunos têm escola, turma e turno
+      // Apenas alunos têm turma e turno
       if (userType === "student") {
-        profileData.escola_id = schoolId;
         profileData.turma_id = classId;
         profileData.turno = turno;
       } else {
-        // Professores e admins não têm escola/turma/turno
-        profileData.escola_id = null;
+        // Professores e admins não têm turma/turno
         profileData.turma_id = null;
         profileData.turno = null;
       }
@@ -261,8 +258,6 @@ export default function Auth() {
   return (
     <SchoolBackground variant="textura">
       <div className="min-h-screen flex items-center justify-center p-4">
-        <AccessibilityBar />
-      
       <div className="w-full max-w-md space-y-6 animate-fade-in">
         <div className="text-center space-y-2">
           <Link 
@@ -392,39 +387,6 @@ export default function Auth() {
                         <SelectItem value="admin">Administrador(a)</SelectItem>
                       </SelectContent>
                     </Select>
-                    <div className="mt-3 grid grid-cols-2 gap-2" aria-label="Atalhos visuais de ação">
-                      <Button
-                        type="button"
-                        className="h-11 text-base font-semibold bg-red-600 hover:bg-red-700 text-white"
-                        onClick={() => setActiveTab("login")}
-                      >
-                        🔴 Entrar
-                      </Button>
-                      <Button
-                        type="button"
-                        className="h-11 text-base font-semibold bg-blue-600 hover:bg-blue-700 text-white"
-                        onClick={() => setActiveTab("signup")}
-                      >
-                        🔵 Criar conta
-                      </Button>
-                      <Button
-                        type="button"
-                        className="h-11 text-base font-semibold bg-green-600 hover:bg-green-700 text-white col-span-2"
-                        onClick={() => {
-                          setActiveTab("signup");
-                          setTimeout(() => document.getElementById("deficiency")?.focus(), 100);
-                        }}
-                      >
-                        🟢 Acessibilidade visual
-                      </Button>
-                      <Button
-                        asChild
-                        type="button"
-                        className="h-11 text-base font-semibold bg-yellow-500 hover:bg-yellow-600 text-black col-span-2"
-                      >
-                        <Link to="/">🟡 Voltar para o início</Link>
-                      </Button>
-                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -439,6 +401,26 @@ export default function Auth() {
                             {option.label}
                           </SelectItem>
                         ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="predefined-school">Escola</Label>
+                    <Select
+                      value={schoolId || ""}
+                      onValueChange={(value) => {
+                        setSchoolId(value);
+                        setClassId("");
+                      }}
+                    >
+                      <SelectTrigger id="predefined-school">
+                        <SelectValue placeholder="Selecione uma escola" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="erem-anibal-falcao">Erem Anibal Falcão</SelectItem>
+                        <SelectItem value="erem-petronio-correia">Erem Petronio Correia</SelectItem>
+                        <SelectItem value="erem-paulo-guerra">Erem Paulo Guerra</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -460,36 +442,6 @@ export default function Auth() {
                             <SelectItem value="manha">Manhã</SelectItem>
                             <SelectItem value="tarde">Tarde</SelectItem>
                             <SelectItem value="noite">Noite</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="school">Escola <span className="text-destructive">*</span></Label>
-                        <Select
-                          value={schoolId || ""}
-                          onValueChange={(value) => {
-                            setSchoolId(value);
-                            setClassId("");
-                          }}
-                          required
-                          disabled={isLoadingSchools}
-                        >
-                          <SelectTrigger id="school" aria-required="true" disabled={isLoadingSchools}>
-                            <SelectValue placeholder={isLoadingSchools ? "Carregando escolas..." : "Selecione a escola"} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {isLoadingSchools ? (
-                              <SelectItem value="" disabled>Carregando...</SelectItem>
-                            ) : schools.length === 0 ? (
-                              <SelectItem value="" disabled>Nenhuma escola cadastrada</SelectItem>
-                            ) : (
-                              schools.map((school) => (
-                                <SelectItem key={school.id} value={school.id}>
-                                  {school.nome}
-                                </SelectItem>
-                              ))
-                            )}
                           </SelectContent>
                         </Select>
                       </div>
@@ -531,13 +483,6 @@ export default function Auth() {
                       </div>
                     </>
                   ) : null}
-
-                  {/* Mensagem informativa para professores/admins */}
-                  {(userType === "teacher" || userType === "admin") && (
-                    <div className="p-3 bg-muted/50 rounded-md text-sm text-muted-foreground">
-                      <p>Professores e administradores não precisam selecionar escola ou turma.</p>
-                    </div>
-                  )}
 
                   <Button 
                     type="submit" 

@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AccessibilityBar } from "@/components/AccessibilityBar";
 import {
   BookOpen,
   Users,
@@ -18,8 +17,6 @@ import { SchoolBackground } from "@/components/SchoolBackground";
 export default function Landing() {
   return (
     <SchoolBackground variant="textura">
-      <AccessibilityBar />
-      
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 gradient-hero opacity-10" />

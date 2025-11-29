@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ProtectedPageLayout } from "@/components/ProtectedPageLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Users, FolderOpen } from "lucide-react";
+import {
+  Users,
+  FolderOpen,
+  Award,
+  CalendarCheck,
+  BookOpenCheck,
+  MessageSquare,
+  TrendingUp,
+} from "lucide-react";
 
 type Subject = {
   id: string;
@@ -81,6 +89,96 @@ export default function TeacherSubjectsPage() {
     loadTurmas();
   }, [profile?.escola_id, user]);
 
+  const sampleSubjects: Subject[] = [
+    {
+      id: "sample-1",
+      nome: "Matemática Aplicada",
+      descricao: "Raciocínio lógico, funções e problemas contextualizados.",
+      turma: {
+        id: "sample-turma-1",
+        nome: "3º A",
+        ano: "2025",
+        escola: {
+          id: "sample-escola",
+          nome: "Erem Anibal Falcão",
+        },
+      },
+    },
+    {
+      id: "sample-2",
+      nome: "Projeto Integrador STEM",
+      descricao: "Metodologias ativas envolvendo tecnologia e ciência.",
+      turma: {
+        id: "sample-turma-2",
+        nome: "2º B",
+        ano: "2025",
+        escola: {
+          id: "sample-escola",
+          nome: "Erem Anibal Falcão",
+        },
+      },
+    },
+  ];
+
+  const sampleStudentsByClass: Record<string, StudentProfile[]> = {
+    "sample-turma-1": [
+      { id: "sample-student-1", name: "Ana Bezerra", deficiencia: "Visual", turma_id: "sample-turma-1" },
+      { id: "sample-student-2", name: "Rafael Souza", deficiencia: null, turma_id: "sample-turma-1" },
+    ],
+    "sample-turma-2": [
+      { id: "sample-student-3", name: "Paulo Henrique", deficiencia: "Auditiva", turma_id: "sample-turma-2" },
+      { id: "sample-student-4", name: "Isabella Lima", deficiencia: null, turma_id: "sample-turma-2" },
+    ],
+  };
+
+  const teachingHighlights = [
+    {
+      label: "Turmas acompanhadas",
+      value: new Set(subjects.map((s) => s.turma?.id || s.id)).size,
+      icon: Users,
+      extra: "Atualizado automaticamente",
+    },
+    {
+      label: "Projetos ativos",
+      value: subjects.length > 0 ? subjects.length : sampleSubjects.length,
+      icon: BookOpenCheck,
+      extra: "Incluindo interdisciplinares",
+    },
+    {
+      label: "Avaliações planejadas",
+      value: "4 próximas",
+      icon: CalendarCheck,
+      extra: "Gerencie os prazos",
+    },
+    {
+      label: "Reconhecimentos",
+      value: "2 destaques",
+      icon: Award,
+      extra: "Coordenação pedagógica",
+    },
+  ];
+
+  const upcomingActivities = [
+    {
+      title: "Revisão para ENEM",
+      turma: "3º A",
+      date: "16/05",
+      type: "Mentoria",
+    },
+    {
+      title: "Apresentação Projeto STEM",
+      turma: "2º B",
+      date: "21/05",
+      type: "Projeto",
+    },
+    {
+      title: "Avaliação diagnóstica",
+      turma: "1º A",
+      date: "28/05",
+      type: "Prova",
+    },
+  ];
+
   useEffect(() => {
     const load = async () => {
       if (!user) return;
@@ -105,6 +203,14 @@ export default function TeacherSubjectsPage() {
         if (error) throw error;
 
         const subjectList = (data || []) as Subject[];
+
+        if (subjectList.length === 0) {
+          setSubjects(sampleSubjects);
+          setStudentsByClass(sampleStudentsByClass);
+          setIsFetching(false);
+          return;
+        }
+
         setSubjects(subjectList);
 
         const turmaIds = subjectList
@@ -190,6 +296,10 @@ export default function TeacherSubjectsPage() {
   };
 
   const handleDeleteSubject = async (id: string) => {
+    if (id.startsWith("sample-")) {
+      setSubjects((prev) => prev.filter((s) => s.id !== id));
+      return;
+    }
     if (!confirm("Tem certeza que deseja remover esta matéria?")) return;
 
     try {
@@ -223,10 +333,29 @@ export default function TeacherSubjectsPage() {
       profile={profile}
       actions={
         <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-          {subjects.length} matérias • {totalStudents} alunos
+          {subjects.length} matérias • {totalStudents || Object.values(sampleStudentsByClass).flat().length} alunos
         </Badge>
       }
     >
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6">
+        {teachingHighlights.map((item) => (
+          <Card key={item.label} className="card-school shadow-school">
+            <CardContent className="pt-6 flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <span className="p-2 rounded-full bg-primary/10 text-primary">
+                  <item.icon className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{item.label}</p>
+                  <p className="text-2xl font-bold text-foreground">{item.value}</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">{item.extra}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       <Card className="shadow-school-lg">
         <CardHeader className="bg-gradient-to-br from-primary/10 to-secondary/10">
           <CardTitle className="flex items-center justify-between gap-2 text-primary">
@@ -293,22 +422,12 @@ export default function TeacherSubjectsPage() {
         <div className="w-full py-16 flex items-center justify-center text-muted-foreground">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" aria-label="Carregando" />
         </div>
-      ) : subjects.length === 0 ? (
-        <Card className="shadow-school-lg">
-          <CardHeader className="bg-gradient-to-br from-muted/60 to-muted/20">
-            <CardTitle className="flex items-center gap-2 text-muted-foreground">
-              <FolderOpen className="h-5 w-5" /> Nenhuma matéria cadastrada
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6 text-sm text-muted-foreground">
-            <p>Cadastre suas matérias para visualizar os alunos e turmas vinculadas.</p>
-          </CardContent>
-        </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           {subjects.map((subject) => {
             const classId = subject.turma?.id || "sem-turma";
             const students = studentsByClass[classId] || [];
+            const isSampleSubject = subject.id.startsWith("sample-");
 
             return (
               <Card key={subject.id} className="shadow-school-lg">
@@ -364,8 +483,9 @@ export default function TeacherSubjectsPage() {
                       size="sm"
                       className="border-destructive/40 text-destructive hover:bg-destructive hover:text-white"
                       onClick={() => handleDeleteSubject(subject.id)}
+                      disabled={isSampleSubject}
                     >
-                      Remover matéria
+                      {isSampleSubject ? "Exemplo" : "Remover matéria"}
                     </Button>
                   </div>
                 </CardContent>
@@ -374,6 +494,48 @@ export default function TeacherSubjectsPage() {
           })}
         </div>
       )}
+
+      <Card className="shadow-school-lg mt-6">
+        <CardHeader className="bg-gradient-to-br from-secondary/10 to-primary/10">
+          <CardTitle className="flex items-center gap-2 text-secondary">
+            <MessageSquare className="h-5 w-5" /> Próximas atividades
+          </CardTitle>
+          <CardDescription>Planejamento visual dos próximos encontros</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6 grid md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+          {upcomingActivities.map((activity) => (
+            <div key={activity.title} className="p-4 rounded-xl border border-border/50 bg-card/40">
+              <p className="text-xs uppercase tracking-wide text-primary">{activity.type}</p>
+              <p className="text-base font-semibold text-foreground">{activity.title}</p>
+              <p className="text-xs text-muted-foreground">Turma {activity.turma}</p>
+              <p className="text-xs text-muted-foreground">Data: {activity.date}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-school-lg mt-6">
+        <CardHeader className="bg-gradient-to-br from-primary/10 to-secondary/10">
+          <CardTitle className="flex items-center gap-2 text-primary">
+            <TrendingUp className="h-5 w-5" /> Boas práticas
+          </CardTitle>
+          <CardDescription>Dicas para acompanhar estudantes com necessidades distintas</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6 grid md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+          <div className="p-4 rounded-xl border border-border/40 bg-card/40">
+            <p className="font-semibold text-foreground mb-1">Briefings semanais</p>
+            <p>Envie um resumo em áudio ou texto com os objetivos da semana.</p>
+          </div>
+          <div className="p-4 rounded-xl border border-border/40 bg-card/40">
+            <p className="font-semibold text-foreground mb-1">Mapas visuais</p>
+            <p>Combine cores e ícones para indicar prioridade ou dificuldade.</p>
+          </div>
+          <div className="p-4 rounded-xl border border-border/40 bg-card/40">
+            <p className="font-semibold text-foreground mb-1">Retornos personalizados</p>
+            <p>Use mensagens individuais para orientar e reconhecer avanços.</p>
+          </div>
+        </CardContent>
+      </Card>
     </ProtectedPageLayout>
   );
 }

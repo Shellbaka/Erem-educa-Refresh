@@ -1,3 +1,15 @@
+# Acessos da plataforma Erem Conecta :
+
+- aluno: marques.tfm@gmail.com
+senha: 123456789
+
+- Professor: mms13@discente.ifpe.edu.br
+senha: 123456789
+
+- Admin: math.marques.silva@gmail.com
+senha: 123456789
+
+
 # 🧩 Erem Conecta – Plataforma Educacional Inclusiva
 
 **Projeto desenvolvido para a disciplina de Embarque Digital**, ministrada pelo **professor André Caetano**, no curso de **Análise e Desenvolvimento de Sistemas (ADS)** – **5º Período / UNINASSAU – Recife-PE**.
